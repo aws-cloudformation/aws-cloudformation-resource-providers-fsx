@@ -1,0 +1,13 @@
+{
+  "FileSystemId": "fs-00000000000000000",
+  "FileSystemPath": "/ns1",
+  "DataRepositoryPath": "s3://{{LustreCFNTestS3ImportBucketName}}",
+  "BatchImportMetaDataOnCreate": true,
+  "ImportedFileChunkSize": 2048,
+  "Tags": [
+    {
+      "Key": "City",
+      "Value": "Boston"
+    }
+  ]
+}

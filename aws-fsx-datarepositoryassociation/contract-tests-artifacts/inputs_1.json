@@ -1,0 +1,43 @@
+{
+  "CreateInputs": {
+    "FileSystemId": "{{awsfsxdatarepositoryassociationcto1}}",
+    "FileSystemPath": "/ns1",
+    "DataRepositoryPath": "s3://{{awsfsxdatarepositoryassociationcto2}}",
+    "BatchImportMetaDataOnCreate": false,
+    "ImportedFileChunkSize": 4096,
+    "Tags": [
+      {
+        "Key": "State",
+        "Value": "Massachusetts"
+      }
+    ]
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "/ImportedFileChunkSize",
+      "value": 2048
+    },
+    {
+      "op": "replace",
+      "path": "/Tags/0/Key",
+      "value": "Location"
+    },
+    {
+      "op": "add",
+      "path": "/S3",
+      "value": {
+        "AutoImportPolicy": {
+          "Events": [
+            "NEW"
+          ]
+        },
+        "AutoExportPolicy": {
+          "Events": [
+            "NEW"
+          ]
+        }
+      }
+    }
+  ]
+}

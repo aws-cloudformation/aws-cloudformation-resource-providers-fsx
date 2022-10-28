@@ -1,0 +1,26 @@
+{
+  "credentials": {
+    "accessKeyId": "to-be-replaced-manually",
+    "secretAccessKey": "to-be-replaced-manually",
+    "sessionToken": "to-be-replaced-manually"
+  },
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "testCreate",
+    "desiredResourceState": {
+      "FileSystemId": "to-be-replaced-manually",
+      "FileSystemPath": "/ns1",
+      "DataRepositoryPath": "to-be-replaced-manually",
+      "BatchImportMetaDataOnCreate": true,
+      "ImportedFileChunkSize": 2048,
+      "Tags": [
+        {
+          "Key": "City",
+          "Value": "Boston"
+        }
+      ]
+    },
+    "logicalResourceIdentifier": "DRA"
+  },
+  "callbackContext": null
+}
