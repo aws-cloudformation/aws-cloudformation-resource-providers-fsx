@@ -1,0 +1,13 @@
+{
+  "FileSystemId": "{{P1LustreFileSystemForContractTestId}}",
+  "FileSystemPath": "/ns1",
+  "DataRepositoryPath": "s3://{{LustreCFNTestS3ImportBucketName}}",
+  "BatchImportMetaDataOnCreate": true,
+  "ImportedFileChunkSize": 4096,
+  "Tags": [
+    {
+      "Key": "State",
+      "Value": "Massachusetts"
+    }
+  ]
+}

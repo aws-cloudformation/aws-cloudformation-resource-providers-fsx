@@ -1,0 +1,14 @@
+{
+  "credentials": {
+    "accessKeyId": "to-be-replaced-manually",
+    "secretAccessKey": "to-be-replaced-manually",
+    "sessionToken": "to-be-replaced-manually"
+  },
+  "action": "LIST",
+  "request": {
+    "clientRequestToken": "testList",
+    "desiredResourceState": null,
+    "logicalResourceIdentifier": "DRA"
+  },
+  "callbackContext": null
+}
