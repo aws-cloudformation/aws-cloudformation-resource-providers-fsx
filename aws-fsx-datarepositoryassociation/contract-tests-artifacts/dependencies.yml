@@ -1,0 +1,149 @@
+---
+Description: "Contract test resources for V2 contract tests"
+Parameters:
+  VpcCidrBlock:
+    Default: 10.0.0.0/16
+    Description: CidrBlock for the IP spaaaaaace for the the VPC
+    Type: String
+  PublicSubnet01Block:
+    Default: 10.0.8.0/22
+    Description: CidrBlock for subnet 1
+    Type: String
+Resources:
+  EIP1:
+    DependsOn: GatewayAttachement
+    Properties:
+      Domain: vpc
+    Type: 'AWS::EC2::EIP'
+  GatewayAttachement:
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+  LustreIngressSecurityGroup:
+    Properties:
+      GroupDescription: Security group with allowing port 988 traffic ingress rule
+      GroupName: allow-988-ingress-sg
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: '988'
+          IpProtocol: tcp
+          ToPort: '988'
+      VpcId: !Ref VPC
+    Type: 'AWS::EC2::SecurityGroup'
+  LustreS3TestImportBucket:
+    Type: 'AWS::S3::Bucket'
+  PublicNetworkAcl:
+    Metadata:
+      Comment: Access control layer that is attached to the created subnets
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ' '
+            - - !Ref 'AWS::StackName'
+              - Public Network ACLs
+      VpcId: !Ref VPC
+    Type: 'AWS::EC2::NetworkAcl'
+  PublicNetworkAclEntryInboundAll:
+    Metadata:
+      Comment: Allow inbound traffic on all ports (response from outbound requests).
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Egress: false
+      NetworkAclId: !Ref PublicNetworkAcl
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 100
+    Type: 'AWS::EC2::NetworkAclEntry'
+  PublicNetworkAclEntryOutboundAll:
+    Metadata:
+      Comment: Allow outbound traffic on all ports.
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Egress: true
+      NetworkAclId: !Ref PublicNetworkAcl
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 100
+    Type: 'AWS::EC2::NetworkAclEntry'
+  PublicRouteTable:
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ' '
+            - - !Ref 'AWS::StackName'
+              - Public Route Table
+      VpcId: !Ref VPC
+    Type: 'AWS::EC2::RouteTable'
+  PublicRouteTableIGWRoute:
+    DependsOn: GatewayAttachement
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable
+    Type: 'AWS::EC2::Route'
+  PublicSubnet01:
+    Metadata:
+      Comment: Public subnet 1
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet01Block
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ' '
+            - - !Ref 'AWS::StackName'
+              - Public Subnet1
+      VpcId: !Ref VPC
+    Type: 'AWS::EC2::Subnet'
+  PublicSubnetNetworkAclAssociation1:
+    Properties:
+      NetworkAclId: !Ref PublicNetworkAcl
+      SubnetId: !Ref PublicSubnet01
+    Type: 'AWS::EC2::SubnetNetworkAclAssociation'
+  PublicSubnetRouteTableAssociation1:
+    Metadata:
+      Comment: Associate subnet to Public route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet01
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+  VPC:
+    Metadata:
+      Comment: Stage specific VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ''
+            - - !Ref 'AWS::StackName'
+              - ' VPC'
+    Type: 'AWS::EC2::VPC'
+  P1LustreFileSystemForContractTest:
+    Type: "AWS::FSx::FileSystem"
+    Properties:
+      FileSystemType: "LUSTRE"
+      StorageCapacity: 2400
+      StorageType: "SSD"
+      SubnetIds: [!Ref PublicSubnet01]
+      SecurityGroupIds: [!Ref LustreIngressSecurityGroup]
+      FileSystemTypeVersion: "2.12"
+      LustreConfiguration:
+        DeploymentType: 'PERSISTENT_1'
+        PerUnitStorageThroughput: 100
+Outputs:
+  P1LustreFileSystemForContractTestV2Id:
+    Value: !Ref P1LustreFileSystemForContractTest
+    Export:
+      Name: awsfsxdatarepositoryassociationcto1
+  LustreContractTestV2S3ImportBucketName:
+    Value: !Ref LustreS3TestImportBucket
+    Export:
+      Name: awsfsxdatarepositoryassociationcto2
